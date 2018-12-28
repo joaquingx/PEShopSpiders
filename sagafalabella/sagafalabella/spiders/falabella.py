@@ -13,7 +13,7 @@ class FalabellaSpider(scrapy.Spider):
         # we are not interested in some anchors give us url to all categories
         categories = response.xpath(
             '//ul[@class="fb-masthead__grandchild-links"]/li/a[not(contains(text(),"Ver todo"))]/@href').extract()
-        for categorie in categories[0:1]:
+        for categorie in categories:
             categorie_url = response.urljoin(categorie)
             yield Request(categorie_url, callback=self.parse_categorie, dont_filter=True)
 
@@ -44,6 +44,9 @@ class FalabellaSpider(scrapy.Spider):
         else:
             self.logger.info("HORROR EN URL  "+ response.url)
 
+
+# url for especific product
+# https://www.falabella.com.pe/rest/model/falabella/rest/browse/BrowseActor/fetch-item-details?{%22products%22:[{%22productId%22:%2216462481%22}]}
     def parse_categorie_item_list(self, response):
         json_response = json.loads(response.body.decode('utf-8'))
         
