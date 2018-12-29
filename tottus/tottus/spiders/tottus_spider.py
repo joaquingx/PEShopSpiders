@@ -12,7 +12,7 @@ class TottusSpiderSpider(scrapy.Spider):
         categories = response.xpath(
             '//*[@class="nav navbar-nav navbar-categories"]//a[not(@href="#")]/@href').extract()
         url = 'http://www.tottus.com.pe/tottus/productListFragment'
-        for categorie in categories
+        for categorie in categories:
             categorie_url = categorie.replace('/tottus/browse', '')
             yield Request(url+categorie_url, callback=self.parse_categorie_items)
 
