@@ -4,31 +4,37 @@ import re
 
 
 class AdidasSpider(scrapy.Spider):
-    adidas_products = ["calzado-hombre","ropa-hombre","accesorios-hombre","performance-hombre"
-    ,"calzado-mujer","ropa-mujer","accesorios-mujer","performance-mujer"
-    ,"ninos?prefn1=age&prefv1=8-16%20A%C3%B1os&srule=newest-to-oldest"
-    ,"ninos?prefn1=age&prefv1=4-8%20A%C3%B1os"
-    ,"bebe-ninos"
-    ,"performance-ninos"]
     name = 'adidas'
     allowed_domains = ['adidas.pe']
-    start_urls = ['https://adidas.pe/{}'.format(i) for i in adidas_products]
+    start_urls = ['https://m.adidas.pe/on/demandware.store/Sites-adidas-PE-Site/es_PE/Search-BrowseCatalog']
     def parse(self, response):
-        adidas_items = response.xpath('//div[@class="hockeycard originals " or @class="hockeycard performance "]')
-        print(len(adidas_items))
+        adidas_items = response.xpath('//*[contains(@class, "innercard")]')
         for adidas_item in adidas_items:
-            item_name = adidas_item.xpath('.//*[@class="title"]/text()').extract()
-            item_price = re.findall(r'\d+', adidas_item.xpath('.//*[contains(@class, "salesprice")]/text()').extract_first())[0]   
+            item_name = adidas_item.xpath('.//*[@class="title"]/text()').extract_first()
+            item_price = re.findall(r'\d+\.\d+|\d+',adidas_item.xpath('.//*[@class="new-plp-layout-enabled"]/div/*[contains(@class, "salesprice")]/text()').extract_first())[0]
             item_image = adidas_item.xpath('.//*[@class="show lazyload"]/@data-original').extract_first()
             item_url = adidas_item.xpath('.//*[@class="image plp-image-bg"]/a/@href').extract_first()
-            item_star = adidas_item.xpath('.//*[@class="rating-stars rating-stars-filled"]/@style').extract_first()
-            # item_star = int(re.findall(r'\d+',adidas_item.xpath('.//*[@class="rating-stars rating-stars-filled"]/@style').extract_first())[0])    
+            item_width = adidas_item.xpath('.//*[@class="rating-stars rating-stars-filled"]/@style').extract_first()
+ 
+            if item_width is None:
+                item_stars = 'Not Ranked'
+            else:
+                item_stars = int(re.findall(r'\d+', item_width)[0])/20
+            
+            item_stock = adidas_item.xpath('.//*[@class="badge soldout"]/*[@class="badge-text"]/text()').extract_first()
+
+            if item_stock is None:
+                stock = 'Yes'
+            else:
+                stock = 'No'
+
             yield{  'Name' : item_name,
                     'Prices' : item_price,
                     'Image' : item_image,
-                    'URL' : "adidas.pe"+item_url,
-                    'Stars' : item_star
+                    'URL' : item_url,
+                    'Stars' : item_stars,
+                    'Stock' : stock,
                   }
-        next_page_url = response.xpath('//*[@class="paging-arrow pagging-next-page"]/@href').extract_first()
-        absolute_next_page_url = response.urljoin(next_page_url)
-        yield scrapy.Request(absolute_next_page_url)
+        next_page_url = self.start_urls[0] + response.xpath('//*[contains(@class, "next-page pagging-cta")]/@href').extract_first()
+        if next_page_url:
+            yield response.follow(url=next_page_url, callback=self.parse)
