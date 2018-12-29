@@ -1,0 +1,67 @@
+# -*- coding: utf-8 -*-
+import scrapy
+from scrapy import Request
+
+
+class TottusSpiderSpider(scrapy.Spider):
+    name = 'tottus_spider'
+    allowed_domains = ['www.tottus.com.pe']
+    start_urls = ['http://www.tottus.com.pe/tottus/home/']
+
+    def parse(self, response):
+        categories = response.xpath(
+            '//*[@class="nav navbar-nav navbar-categories"]//a[not(@href="#")]/@href').extract()
+        url = 'http://www.tottus.com.pe/tottus/productListFragment'
+        for categorie in categories[0:1]:
+            categorie_url = categorie.replace('/tottus/browse', '')
+            yield Request(url+categorie_url, callback=self.parse_categorie_items)
+
+    def parse_categorie_items(self, response):
+        items = response.xpath('//*[contains(@class," item-product-caption")]')
+        for item in items:
+            out_stock = 1 if item.xpath(
+                '//*[contains(@class,"out-of-stock")]') else 0
+            url = response.urljoin(item.xpath(
+                './/a[@href!=""]/@href').extract_first())
+            title = item.xpath(
+                './/div[@class="title"]//h5/div/text()').extract_first().replace('\n', '')
+            title = title.replace(' ', '')
+            marca = item.xpath(
+                './/div[@class="title"]//h5/span/text()').extract_first()
+            characteristics = item.xpath(
+                './/*[@class="statement"]/text()').extract_first()
+            price = item.xpath(
+                './/*[@class="prices"]/span[@class="nule-price"]/text()').extract_first()
+            if price == None:
+                price = item.xpath(
+                    './/*[@class="prices"]/span[@class="active-price"]/span/text()').extract_first()
+            if price:
+                price = price.replace('\n', '')
+                price = price.replace(' ', '')
+
+            price_red = item.xpath(
+                './/*[@class="prices"]/span[@class="red"]/text()').extract_first()
+            if price_red == None:
+                price_red = item.xpath(
+                    './/*[@class="prices"]/span[@class="active-price"]/span[@class="red"]/text()').extract_first()
+            if price_red:
+                price_red = price_red.replace('\n', '')
+                price_red = price_red.replace(' ', '')
+
+            offer = item.xpath(
+                './/*[@class="active-offer"]/span/text()').extract_first()
+
+            yield{
+                'out_stock': out_stock,
+                'url': url,
+                'title': title,
+                'marca': marca,
+                'characteristics': characteristics,
+                'price': price,
+                'price_red': price_red,
+                'offer': offer,
+            }
+        next_url = response.xpath('//a[@id="next"]/@href').extract_first()
+        absolute_next_page = response.urljoin(next_url)
+        self.logger.info("===> NEXT_PAGE: "+absolute_next_page)
+        yield Request(absolute_next_page, callback=self.parse_categorie_items)
