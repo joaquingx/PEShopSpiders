@@ -3,7 +3,7 @@
 ## Pull Requests
 
 ### Spider output
-PR must include spider(s) output(s), for that, you should add your output in `spider_outputs` folder.
+PR must include spider(s) output(s), for that, you should add your output in `ShopSpiders/ShopSpiders/spiders_output` folder.
 
 Name convention is `spider_name` + `_` + `branch_name.json` e.g. `metro` spider in branch `add-spider-metro` output should've named: `metro_add-spider-metro.json`.
 
