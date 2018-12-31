@@ -33,13 +33,13 @@ class PlazaveaSpider(scrapy.Spider):
                 image = product.xpath('.//*[@class="g-img-prod "]/figure/img/@src').extract_first()
                 url = product.xpath('.//*[@class="g-img-prod "]/@href').extract_first()
                 if discount_price is None:
-                    discount_price = "No disponible"
+                    discount_price = "Not available"
                 if normal_price is None:
-                    normal_price = "No disponible"
+                    normal_price = "Not available"
                 if image is None:
-                    image = "No disponible"
+                    image = "Not available"
                 if url is None:
-                    url = "No disponible"
+                    url = "Not available"
                 yield {'name':name,
                     'normal_price':normal_price,
                     'discount_price': discount_price,
