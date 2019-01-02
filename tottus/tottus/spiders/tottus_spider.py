@@ -26,7 +26,7 @@ class TottusSpiderSpider(scrapy.Spider):
             title = item.xpath(
                 './/div[@class="title"]//h5/div/text()').extract_first().replace('\n', '')
             title = title.replace(' ', '')
-            marca = item.xpath(
+            brand = item.xpath(
                 './/div[@class="title"]//h5/span/text()').extract_first()
             characteristics = item.xpath(
                 './/*[@class="statement"]/text()').extract_first()
@@ -55,7 +55,7 @@ class TottusSpiderSpider(scrapy.Spider):
                 'out_stock': out_stock,
                 'url': url,
                 'title': title,
-                'marca': marca,
+                'brand': brand,
                 'characteristics': characteristics,
                 'price': price,
                 'price_red': price_red,
