@@ -19,7 +19,7 @@ class TottusSpiderSpider(scrapy.Spider):
     def parse_category_items(self, response):
         items = response.xpath('//*[contains(@class," item-product-caption")]')
         for item in items:
-            out_stock = 1 if item.xpath(
+            out_stock = True if item.xpath(
                 '//*[contains(@class,"out-of-stock")]') else 0
             url = response.urljoin(item.xpath(
                 './/a[@href!=""]/@href').extract_first())
