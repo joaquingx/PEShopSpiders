@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from scrapy import Request
 
 
 class TottusSpiderSpider(scrapy.Spider):
@@ -11,12 +10,13 @@ class TottusSpiderSpider(scrapy.Spider):
     def parse(self, response):
         categories = response.xpath(
             '//*[@class="nav navbar-nav navbar-categories"]//a[not(@href="#")]/@href').extract()
+        assert categories, "Categories not found"
         url = 'http://www.tottus.com.pe/tottus/productListFragment'
-        for categorie in categories:
-            categorie_url = categorie.replace('/tottus/browse', '')
-            yield Request(url+categorie_url, callback=self.parse_categorie_items)
+        for category in categories:
+            categorie_url = category.replace('/tottus/browse', '')
+            yield response.follow(url+categorie_url, callback=self.parse_category_items)
 
-    def parse_categorie_items(self, response):
+    def parse_category_items(self, response):
         items = response.xpath('//*[contains(@class," item-product-caption")]')
         for item in items:
             out_stock = 1 if item.xpath(
@@ -64,4 +64,4 @@ class TottusSpiderSpider(scrapy.Spider):
         next_url = response.xpath('//a[@id="next"]/@href').extract_first()
         absolute_next_page = response.urljoin(next_url)
         self.logger.info("===> NEXT_PAGE: "+absolute_next_page)
-        yield Request(absolute_next_page, callback=self.parse_categorie_items)
+        yield response.follow(absolute_next_page, callback=self.parse_category_items)
