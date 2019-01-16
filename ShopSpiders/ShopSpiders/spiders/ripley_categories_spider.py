@@ -20,8 +20,8 @@ class RipleySpider(SitemapSpider):
                 'Normal_price': nPrice if nPrice else "Not found",
                 'Internet_price': iPrice if iPrice else "Not found",
                 'Discount': discount if discount else "Not found",
+                'url':response.url,
             }
-        mark = response.xpath('//*[@id="catalog-page"]/div/div[2]/div[4]/nav/ul/li[4]/a/@href').extract_first()
-        if mark!='#':
-            next_page = response.urljoin(mark)
-            yield response.follow(next_page, callback=self.parse)
+        bar = response.xpath('//*[@id="catalog-page"]/div/div[2]/div[4]/nav/ul/li/a/@href')
+        for mark in bar:
+            yield response.follow(mark, callback=self.parse)
