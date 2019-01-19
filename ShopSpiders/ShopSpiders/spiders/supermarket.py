@@ -4,8 +4,10 @@ import json
 from scrapy.spiders import SitemapSpider
 from scrapy import Request
 from inline_requests import inline_requests
+from ShopSpiders.loaders.shop_loaders import ShopItemLoader
 
 
+# TODO: Handle completely card_price
 class SuperMarketBase(SitemapSpider):
     sitemap_rules = [
         ('/p', 'parse_item'),  # Parse products(/p) with parse_item
@@ -15,15 +17,8 @@ class SuperMarketBase(SitemapSpider):
 
     @inline_requests
     def parse_item(self, response):
-        def get_price(name_class):
-            return response.css(f'.{name_class}::text').re_first('\d+\.\d+')
-
-        def is_available():
-            qty = response.css('script').re_first('"skuStocks"\:\{.*?\:(\d+)\}')
-            return int(qty) if qty else False
-
         card_price = 'Not Found'
-        if self.card_url:    # It's possible to exist offers
+        if self.card_url:  # It's possible to exist offers
             sku_id = response.css('#___rc-p-sku-ids::attr(value)').get()
             assert sku_id, "sku_id not found"
 
@@ -36,25 +31,23 @@ class SuperMarketBase(SitemapSpider):
                         card_dict[0]['items'][0]['sellers'][0]['commertialOffer']['Teasers'][0][
                             '<Effects>k__BackingField'][
                             '<Parameters>k__BackingField'][0]['<Value>k__BackingField']
-                    if '.' in card_price:    # If obtains a discount instead final price
-                        card_price = float(get_price('skuBestPrice')) * (1-(float(card_price)/100))    # TODO: This could be buggy
-                    else:
-                        card_price = card_price[:-2] + ".00"
+                    card_price = card_price[:-2] + ".00"
                 except (KeyError, IndexError) as e:
                     card_price = 'Not Found'
 
-        result = {
-            'regular_price': get_price('skuListPrice'),
-            'online_price': get_price('skuBestPrice') if get_price('skuBestPrice') else 'Not Found',
-            'card_price': card_price,
-            'description': response.css('.productDescription').xpath('string()').get(),
-            'name': response.css('.productName::text').get(),
-            'img_url': response.css(".image-zoom::attr(href)").get(),
-            'url': response.url,
-            'stock': True if is_available() else False,
-            'stars': '0',  # Apparently stars doesn't work for now
-        }
-        yield result
+        css_st = '.{}::text'
+        result = ShopItemLoader(item={}, selector=response)
+        result.add_css('regular_price', css_st.format('skuListPrice'))
+        result.add_css('online_price', css_st.format('skuBestPrice'))
+        result.add_value('card_price', card_price)
+        result.add_css('description', '.productDescription')
+        result.add_css('name', '.productName::text')
+        result.add_css('img_url', '.image-zoom::attr(href)')
+        result.add_value('url', response.url)
+        result.add_css('stock', 'script', re='"skuStocks"\:\{.*?\:(\d+)\}')
+        result.add_value('stars', '0')  # Apparently stars doesn't work for now
+
+        yield result.load_item()
 
 
 class MetroSpider(SuperMarketBase):
