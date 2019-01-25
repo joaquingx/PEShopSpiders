@@ -12,6 +12,7 @@ class FalabellaSpider(scrapy.Spider):
         # we are not interested in some anchors give us url to all categories
         categories = response.xpath(
             '//ul[@class="fb-masthead__grandchild-links"]/li/a[not(contains(text(),"Ver todo"))]/@href').extract()
+        assert categories, "Categories not found"
         for categorie in categories:
             categorie_url = response.urljoin(categorie)
             yield response.follow(categorie_url, callback=self.parse_categorie, dont_filter=True)
