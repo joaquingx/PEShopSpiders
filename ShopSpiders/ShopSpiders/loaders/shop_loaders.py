@@ -17,7 +17,6 @@ class ShopItemLoader(ItemLoader):
     default_input_processor = MapCompose(
         replace_entities,  # Convert to unicode character when necessary
         replace_tags,  # Deletes html/xml tags
-        strip_html5_whitespace,
     )
     regular_price_in = online_price_in = card_price_in = MapCompose(
         replace_decimals,

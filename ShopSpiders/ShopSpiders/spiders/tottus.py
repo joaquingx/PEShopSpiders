@@ -36,9 +36,9 @@ class TottusSpider(scrapy.Spider):
             if price_red == None:
                 price_red = item.xpath(
                     './/*[@class="prices"]/span[@class="active-price"]/span[@class="red"]/text()').extract_first()
-            shop_loader.add_value('online_price_in', price_red if price_red else 'Not Found')
+            shop_loader.add_value('online_price',  re.findall(r'\d+\.\d+|\d+',price_red) if price_red else 0.00)
             offer = item.xpath('.//*[@class="active-offer"]/span/text()').extract_first()
-            shop_loader.add_value('card_price_in', offer if offer else 'Not Found')
+            shop_loader.add_value('card_price', re.findall(r'\d+\.\d+|\d+',offer) if offer else 0.00)
             yield shop_loader.load_item()
         next_url = response.xpath('//a[@id="next"]/@href').extract_first()
         absolute_next_page = response.urljoin(next_url)
