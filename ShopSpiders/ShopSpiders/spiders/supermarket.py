@@ -4,7 +4,7 @@ import json
 from scrapy.spiders import SitemapSpider
 from scrapy import Request
 from inline_requests import inline_requests
-from ShopSpiders.loaders.shop_loaders import ShopItemLoader
+from ..loaders.shop_loaders import ShopItemLoader
 
 
 # TODO: Handle completely card_price

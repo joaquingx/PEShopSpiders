@@ -1,0 +1,4 @@
+dnspython
+scrapy-inline-requests
+scrapy
+pymongo

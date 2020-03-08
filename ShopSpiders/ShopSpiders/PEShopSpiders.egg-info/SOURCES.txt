@@ -1,0 +1,14 @@
+setup.py
+PEShopSpiders.egg-info/PKG-INFO
+PEShopSpiders.egg-info/SOURCES.txt
+PEShopSpiders.egg-info/dependency_links.txt
+PEShopSpiders.egg-info/top_level.txt
+spiders/__init__.py
+spiders/adidas.py
+spiders/ripley_categories_spider.py
+spiders/ripley_product_spider.py
+spiders/supermarket.py
+utils/__init__.py
+utils/mongo_db_utils.py
+utils/normalization.py
+utils/setup.py
