@@ -8,9 +8,9 @@ const resultsSchema = new Schema({
     descriptions: Array,
     regular_prices: Array,
     online_prices: Array,
-    starrs: Array,
+    starss: Array,
     stocks: Array,
-    urls: Object,
+    urls: Array,
 });
 
 const Result = mongoose.model('results', resultsSchema);
