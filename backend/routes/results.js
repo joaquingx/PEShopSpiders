@@ -6,6 +6,62 @@ let Results = require('../models/results.model');
 function appendToArray(arr, toAppend){
     return arr.concat(toAppend)
 }
+function comparePrices(a,b ){
+    if (b[1] === 'Not Found'){
+        return -1;
+    } else if(a[1] === 'Not Found'){
+        return 1;
+    }
+    if (a[1] < b[1]){
+        return -1;
+    } else{
+        return 1;
+    }
+}
+
+function beautifyDescription(desc){
+    console.dir(desc);
+    if(desc === 'card_prices'){
+        return 'Con Tarjeta' ;
+    } else if(desc === 'regular_prices'){
+        return 'Fisico';
+    } else{
+        return 'Online';
+    }
+}
+
+function normalizePrice(market,  price, key){
+    let price_number = price;
+    if (!isNaN(price)){
+        price_number = Number(price_number);
+    }
+    if (price_number === 0){
+        price_number = 'Not Found';
+    }
+    return [market + '(' + beautifyDescription(key) + ')', price_number]
+}
+
+function sortInformation(result){
+    keys = [
+        'card_prices',
+        'online_prices',
+        'regular_prices',
+    ];
+    prices = [];
+    for (const [key, value] of Object.entries(result._doc)) {
+        if (keys.includes(key)){
+            for (var price_dict of Array.from(value)){
+                for (const [market, price] of Object.entries(price_dict)){
+                    prices.push(normalizePrice(market, price, key));
+                }
+            }
+
+        }
+    }
+    prices.sort(comparePrices);
+    return prices;
+}
+
 
 
 router.route('/').get((req, res) => {
@@ -16,7 +72,10 @@ router.route('/').get((req, res) => {
 
 router.route('/:id').get((req, res) => {
    Results.findById(req.params.id)
-       .then(result => res.json(result))
+       .then(result => {
+           result._doc.sorted_prices = sortInformation(result);
+           return res.json(result);
+       })
        .catch(err => res.status(400).json('Error' + err));
 });
 

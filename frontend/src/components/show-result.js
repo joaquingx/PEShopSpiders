@@ -4,9 +4,6 @@ import "bootstrap/dist/js/bootstrap.min"
 import './showresult.css'
 import axios from 'axios';
 
-const https = require('https');
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 export default class ShowResult extends Component{
     constructor(props) {
         super(props);
@@ -14,15 +11,17 @@ export default class ShowResult extends Component{
             name: '',
             card_prices: [],
             online_prices: [],
+            descriptions: [],
+            stocks: [],
+            urls: [],
+            starss: [],
             img_urls: [{"img_url": ""}],
+            sorted_prices: [],
         }
     }
 
     componentDidMount() {
-        const instance = new https.Agent({
-            rejectUnauthorized: false
-        });
-        axios.get('http://localhost:5000/results/' + this.props.match.params.id, {httpsAgent: instance})
+        axios.get('http://localhost:5000/results/' + this.props.match.params.id)
             .then(response => {
                 this.setState({
                     card_prices: response.data.card_prices,
@@ -34,26 +33,20 @@ export default class ShowResult extends Component{
                     urls: response.data.urls,
                     starss: response.data.starss,
                     img_urls: response.data.img_urls,
+                    sorted_prices: response.data.sorted_prices,
                 });
-                // console.log(response.data);
             })
-            .catch(function(error) {
-               console.log(error);
-            });
+            .catch(error => console.log(error));
     }
 
     render(){
 
         const item = [];
-        const prices = this.state.online_prices;
-        for (var i = 0; i < prices.length; i++){
-            for (const [key, value] of Object.entries(prices[i])){
-                console.log(key, value);
-                item.push([key, value]);
-            }
+        const prices = this.state.sorted_prices;
+        for (const value of prices) {
+            item.push([value[0], value[1]]);
         }
-        const img_url = this.state.img_urls['wong'];
-        console.log(img_url);
+        const img_url = this.state.img_urls.wong;
 
         return (
             <div className="container">
@@ -64,9 +57,6 @@ export default class ShowResult extends Component{
                     </div>
                     <div className="col-sm-8" style={{border:"0px solid gray"}}>
                         <h3 style={{textTransform: 'capitalize'}}>{this.state.name}</h3>
-                        <h5 style={{color: "#337ab7"}}>vendido por <a href="#">Samsung</a> · <small style={{color:"#337ab7"}}>(5054
-                            ventas)</small></h5>
-
                         <h6 className="title-price"><small>PRECIO</small></h6>
                         {item.map(price => <p><span style={{textTransform: 'capitalize'}}>{price[0]}</span>: {price[1]}</p>)}
                         <div className="section">
