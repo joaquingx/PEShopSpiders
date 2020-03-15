@@ -3,8 +3,12 @@
 from pymongo import MongoClient
 from pymongo.collection import Collection
 
+# from ShopSpiders.settings import MONGO_COLLECTION, MONGO_DB, MONGO_URI
+# from ShopSpiders.utils.normalization import normalize
+
 from ShopSpiders.settings import MONGO_COLLECTION, MONGO_DB, MONGO_URI
 from ShopSpiders.utils.normalization import normalize
+
 
 
 def get_collection() -> Collection:
