@@ -1,8 +1,9 @@
 from pprint import pprint
 from gensim import corpora, models, similarities
 
-from ShopSpiders.utils.normalization import str_to_strlist, get_frequency_for_dict
-from ShopSpiders.utils.mongo_db_utils import get_collection
+from utils.normalization import str_to_strlist, get_frequency_for_dict
+from utils.mongo_db_utils import get_collection
+from data import get_data_file
 
 
 def get_dictionary(corpus, f_min=1):
@@ -16,18 +17,16 @@ def get_dictionary(corpus, f_min=1):
 
 def save_model():
     corpus = [document['name'] for document in list(get_collection().find({}))]
-    # corpus = get_local_corpus()
     dictionary = get_dictionary(corpus, 1)
     bow_corpus = [dictionary.doc2bow(str_to_strlist(text)) for text in corpus]
     pprint(bow_corpus)
     tfidf = models.TfidfModel(bow_corpus)
-    tfidf.save('tfidf_initial_model.tfidf')
-    dictionary.save_as_text('dictionary.dict')
-    with open('corpus.save', 'w') as c_fn:
+    tfidf.save(get_data_file('tfidf_initial_model.tfidf'))
+    dictionary.save_as_text(get_data_file('dictionary.dict'))
+    with open(get_data_file('corpus.save'), 'w') as c_fn:
         for idx, name in enumerate(corpus):
             c_fn.write(f'{name}')
             c_fn.write('\n')
-    # index = similarities.SparseMatrixSimilarity(tfidf[bow_corpus], num_features=15)
 
 
 def get_local_corpus():
@@ -39,21 +38,18 @@ def get_local_corpus():
 
 
 def load_dict_model():
-    tfidf = models.TfidfModel.load('tfidf_initial_model.tfidf')
-    dictionary = corpora.Dictionary.load_from_text('dictionary.dict')
+    tfidf = models.TfidfModel.load(get_data_file('tfidf_initial_model.tfidf'))
+    dictionary = corpora.Dictionary.load_from_text(get_data_file('dictionary.dict'))
     return dictionary, tfidf
 
 
 def get_index(corpus, dictionary, model):
-    # corpus = get_local_corpus()
     bow_corpus = [dictionary.doc2bow(str_to_strlist(text)) for text in corpus]
     index = similarities.SparseMatrixSimilarity(model[bow_corpus], num_features=5000)
     return index
 
 
 def similarity(corpus, sentence, dictionary, model, index):
-    # corpus = get_local_corpus()
-    # corpus = [document['name'] for document in list(get_collection().find({}))]
     query_sentence = str_to_strlist(sentence)
     query_bow = dictionary.doc2bow(query_sentence)
     sims = index[model[query_bow]]
@@ -64,23 +60,3 @@ def similarity(corpus, sentence, dictionary, model, index):
     with open('pruebas.try', 'a') as pruebas_fn:
         pruebas_fn.write(conclusion)
         pruebas_fn.write('\n')
-
-
-
-# import sys
-# option = sys.argv[1]
-# if option == 'save':
-#     save_model()
-#
-# if option == 'load':
-#     dictionary, model = load_dict_model()
-#     index = get_index(dictionary, model)
-#     inp = input('Ingresa tu vacilon: ')
-#     pprint(similarity(inp, dictionary, model, index))
-
-
-# while True:
-#     inp = input("Ingresa un sentence: ")
-#     print(str_to_strlist(inp))
-#     sims = index[tfidf[dictionary.doc2bow(str_to_strlist(inp))]]
-#     pprint(list(enumerate(sims)))

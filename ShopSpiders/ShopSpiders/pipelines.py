@@ -6,8 +6,8 @@
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import logging
 
-from ShopSpiders.utils.mongo_db_utils import insert_update, get_collection
-from ShopSpiders.utils.similarity import load_dict_model, get_index, similarity
+from utils.mongo_db_utils import insert_update, get_collection
+from utils.similarity import load_dict_model, get_index, similarity
 
 
 class ShopspidersPipeline(object):
