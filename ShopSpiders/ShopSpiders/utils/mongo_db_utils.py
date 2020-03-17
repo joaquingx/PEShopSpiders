@@ -26,6 +26,6 @@ def transform_to_update(document: dict, name: str):
 
 
 def insert_update(document: dict, spider, collect: Collection) -> bool:
-    """name will be searched on db, if found then just update item otherwise create a new one."""
+    """Name will be searched on db, if found then just update item otherwise create a new one."""
     document['name'] = normalize(document['name'])
     return collect.update_one({'name': document['name']}, transform_to_update(document, spider.name), upsert=True).acknowledged

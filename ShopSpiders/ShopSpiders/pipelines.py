@@ -25,3 +25,11 @@ class ShopspidersPipeline(object):
         # else:
         #     logging.log(logging.error, "%s not inserted", item)
         return item
+
+
+# class SimilarityPipeline(object):
+#     def __init__(self):
+#         self.dictionary, self.model = load_dict_model()
+#         self.corpus = [document['name'] for document in list(get_collection().find({}))]
+#
+#     def
