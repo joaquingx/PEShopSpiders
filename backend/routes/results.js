@@ -20,7 +20,6 @@ function comparePrices(a,b ){
 }
 
 function beautifyDescription(desc){
-    console.dir(desc);
     if(desc === 'card_prices'){
         return 'Con Tarjeta' ;
     } else if(desc === 'regular_prices'){
@@ -68,6 +67,15 @@ router.route('/').get((req, res) => {
    Results.find()
        .then(result => res.json(result))
        .catch(err => res.status(400).json('Error: '+ err));
+});
+
+router.route('/lower=:lower&upper=:upper').get((req, res) => {
+    lower = parseInt(req.params.lower);
+    upper = parseInt(req.params.upper);
+    Results.find()
+        .skip(lower)
+        .limit(upper-lower)
+        .then(results => res.json(results))
 });
 
 router.route('/:id').get((req, res) => {

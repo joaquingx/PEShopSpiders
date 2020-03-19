@@ -20,8 +20,13 @@ connection.once('open', () => {
 });
 
 const resultsRouter = require('./routes/results');
+const healthRouter = require('./routes/health');
 
 app.use('/results', resultsRouter);
+app.use('/health', healthRouter);
+app.get('/', (req, res) =>{
+    res.send('Welcome to PESHOPSPIDERS Backend')
+});
 
 app.listen(port, () =>{
    console.log(`Server is running on port: ${port}`)
