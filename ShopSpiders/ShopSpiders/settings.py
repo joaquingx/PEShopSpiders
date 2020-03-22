@@ -20,8 +20,16 @@ USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Ge
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
+ITEM_PIPELINES = {
+    'ShopSpiders.pipelines.ShopspidersPipeline': 300,
+}
+
+MONGO_URI = 'mongodb+srv://user1:user1@cluster0-lnitk.gcp.mongodb.net/test?retryWrites=true&w=majority'
+MONGO_DB = 'shop-info'
+MONGO_COLLECTION = 'results'
+
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 64
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay

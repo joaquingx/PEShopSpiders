@@ -1,5 +1,6 @@
 from scrapy.spiders import SitemapSpider
 
+
 class RipleySpider(SitemapSpider):
 
     name = "ripley"
