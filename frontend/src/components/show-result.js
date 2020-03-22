@@ -19,34 +19,35 @@ export default class ShowResult extends Component{
             sorted_prices: [],
         }
     }
-
-    componentDidMount() {
-        axios.get('http://localhost:5000/results/' + this.props.match.params.id)
-            .then(response => {
-                this.setState({
-                    card_prices: response.data.card_prices,
-                    regular_prices: response.data.regular_prices,
-                    online_prices: response.data.online_prices,
-                    descriptions: response.data.descriptions,
-                    name: response.data.name,
-                    stocks: response.data.stocks,
-                    urls: response.data.urls,
-                    starss: response.data.starss,
-                    img_urls: response.data.img_urls,
-                    sorted_prices: response.data.sorted_prices,
-                });
-            })
-            .catch(error => console.log(error));
-    }
+    //
+    // componentDidMount() {
+    //     axios.get('http://localhost:5000/results/' + this.props.match.params.id)
+    //         .then(response => {
+    //             this.setState({
+    //                 card_prices: response.data.card_prices,
+    //                 regular_prices: response.data.regular_prices,
+    //                 online_prices: response.data.online_prices,
+    //                 descriptions: response.data.descriptions,
+    //                 name: response.data.name,
+    //                 stocks: response.data.stocks,
+    //                 urls: response.data.urls,
+    //                 starss: response.data.starss,
+    //                 img_urls: response.data.img_urls,
+    //                 sorted_prices: response.data.sorted_prices,
+    //             });
+    //         })
+    //         .catch(error => console.log(error));
+    // }
 
     render(){
 
         const item = [];
-        const prices = this.state.sorted_prices;
+        console.log("sorted prices: " + this.props.result.sorted_prices);
+        const prices = this.props.result.sorted_prices;
         for (const value of prices) {
             item.push([value[0], value[1]]);
         }
-        const img_url = this.state.img_urls.wong;
+        const img_url = this.props.result.img_urls.wong;
 
         return (
             <div className="container">
@@ -83,9 +84,9 @@ export default class ShowResult extends Component{
                         </div>
 
                         <div className="section" style={{paddingBottom: "20px"}}>
-                            <button className="btn btn-success"><span style={{marginRight:"20px"}}
+                            <button className="btn btn-success" onClick={this.props.changer} ><span style={{marginRight:"20px"}}
                                                                       className="glyphicon glyphicon-shopping-cart"
-                                                                      aria-hidden="true"></span> Agregar al carro
+                                                                      aria-hidden="true"></span> Regresar
                             </button>
                             <h6><a href="#"><span className="glyphicon glyphicon-heart-empty"
                                                   style={{cursor: "pointer"}}></span> Agregar a lista de deseos</a></h6>

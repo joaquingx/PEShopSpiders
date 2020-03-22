@@ -75,7 +75,19 @@ router.route('/lower=:lower&upper=:upper').get((req, res) => {
     Results.find()
         .skip(lower)
         .limit(upper-lower)
-        .then(results => res.json(results))
+        .then(results => {
+            results.map(result => result._doc.sorted_prices = sortInformation(result));
+            return res.json(results);
+        })
+});
+
+
+router.route('/search=:query').get((req, res) => {
+    Results.find({"$text":{"$search": req.params.query}})
+        .then(results => {
+            results.map(result => result._doc.sorted_prices = sortInformation(result));
+            res.json(results)
+        })
 });
 
 router.route('/:id').get((req, res) => {
