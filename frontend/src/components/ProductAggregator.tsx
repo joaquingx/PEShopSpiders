@@ -1,25 +1,22 @@
 // TODO: add stars, stock
 
 export interface ProductExpand {
+    id: number;
     name: string;
-    providers: Provider[];
+    providers: Provider[]; // in order
 }
 
 export interface Product {
+    id: number;
     name : string;
-    url: string;
     imgUrl: string;
     description: string;
-    providersSimple: ProviderSimple[];
+    providersSimple: ProviderSimple[]; // in order
 }
 
 interface Price {
     price: number;
     date:  number; // TODO: need to change
-    location: {
-        lng: number;
-        lat: number;
-    };
 }
 
 interface Provider {
@@ -32,5 +29,10 @@ interface Provider {
 
 interface ProviderSimple {
     provider: string;
-    bestPrice: Price;
+    url: string;
+    location: {
+        lng: number;
+        lat: number;
+    };
+    prices: Price[];  // intended to be sort.
 }

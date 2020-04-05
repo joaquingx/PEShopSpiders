@@ -78,7 +78,8 @@ main {
 .nav-link {
     display: flex;
     align-items: center;
-    height: 5rem;
+    justify-content: center;
+    height: 7rem;
     color: var(--text-primary);
     text-decoration: None;
     filter: grayscale(100%) opacity(0.7);
@@ -93,6 +94,7 @@ main {
 .fa-size {
     color: #ff7eee;
     transition: var(--transition-speed);
+    text-align: center;
 }
 
 .link-text {
@@ -136,9 +138,6 @@ main {
     main {
         margin: 0;
     }
-    .navbar:hover {
-
-    }
 }
 
 @media only screen and (min-width:600px) {
@@ -153,7 +152,7 @@ main {
     }
 
     .navbar:hover {
-        width: 12rem;
+        width: 11rem;
     }
 
     .navbar:hover .link-text {
