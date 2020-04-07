@@ -3,6 +3,7 @@ import {useEffect, useState} from 'react'
 import  * as React from 'react'
 import './ShowResult.css'
 import * as d3 from 'd3'
+import {Graph} from './Graph'
 
 interface graphData {
     date: Date,
@@ -98,6 +99,16 @@ async function scatterPlot() {
     graphic_data(ff)
 }
 
+let sanitizeGraphData = (d: any): graphData => {
+    return {date: d3.timeParse("%Y-%m-%d")(d.date) as Date, value: d.value}
+};
+
+
+let getGraphData = async (): Promise<graphData[]> => {
+  let downloadData = await d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/connectedscatter.csv");
+  return downloadData.map(sanitizeGraphData)
+};
+
 function useProduct() {
     const initialState: Product = {
         id: 1,
@@ -163,6 +174,7 @@ export default function ShowResult(): JSX.Element {
                     </div>
                 </div>
             </div>
+            <Graph items={getGraphData()}/>
             <div className="insight-container">
                 <div className="price-graph" id="data_viz">
                     {/*Probablemetne aca agregare d3 things*/}
