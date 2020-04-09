@@ -51,7 +51,7 @@ async function scatterPlot() {
             .attr("fill", "none")
             .attr("stroke", "#69b3a2")
             .attr("stroke-width", 1.5)
-            .attr("d", line)
+            .attr("d", line);
 
         let Tooltip = d3.select("#data_viz")
             .append("div")
@@ -91,7 +91,7 @@ async function scatterPlot() {
             .attr("r", 8)
             .attr("fill", "white")
             .attr("stroke", "#69b3a2")
-            .attr("stroke-width", 3)
+            .attr("stroke-width", 10)
             .on("mouseover", mouseover)
             .on("mousemove", mousemove)
             .on("mouseleave", mouseLeave)
@@ -174,12 +174,14 @@ export default function ShowResult(): JSX.Element {
                     </div>
                 </div>
             </div>
-            <Graph items={getGraphData()}/>
             <div className="insight-container">
-                <div className="price-graph" id="data_viz">
-                    {/*Probablemetne aca agregare d3 things*/}
-                </div>
+                <Graph items={getGraphData()}/>
             </div>
+            {/*<div className="insight-container">*/}
+            {/*    <div className="price-graph" id="data_viz">*/}
+            {/*        /!*Probablemetne aca agregare d3 things*!/*/}
+            {/*    </div>*/}
+            {/*</div>*/}
         </div>
     )
 };
