@@ -16,7 +16,7 @@ export interface Product {
 
 interface Price {
     price: number;
-    date:  number; // TODO: need to change
+    date:  Date;
 }
 
 interface Provider {
@@ -35,4 +35,10 @@ interface ProviderSimple {
         lat: number;
     };
     prices: Price[];  // intended to be sort.
+}
+
+// interfaces for visualizations
+export interface graphData {
+    date: Date,
+    price: number,
 }
