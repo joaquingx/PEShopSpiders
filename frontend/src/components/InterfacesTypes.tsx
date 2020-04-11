@@ -1,3 +1,4 @@
+import {ScaleTime, ScaleLinear} from 'd3-scale'
 // TODO: add stars, stock
 
 export interface ProductExpand {
@@ -42,3 +43,6 @@ export interface graphData {
     date: Date,
     price: number,
 }
+
+// @ts-ignore
+export type ScaleD3 = ScaleTime<number, number> | ScaleLinear<number, number>

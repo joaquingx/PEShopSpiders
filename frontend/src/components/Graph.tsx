@@ -1,27 +1,22 @@
 import * as d3 from 'd3'
-import {ScaleLinear, ScaleTime} from 'd3-scale'
 import * as React from 'react'
-import {useEffect, useRef, useState} from 'react'
-import {graphData} from './ProductAggregator'
+import { Fragment } from 'react'
+import {useEffect, useState} from 'react'
+import { graphData, ScaleD3 } from './InterfacesTypes'
 
-const width = 450;
-const height = 400;
-const margin = {top: 20, right: 20, bottom: 20, left: 35};
-const lineColor = "#000000";
-const circleColor = "#69b3a2";
-type ScaleD3 = ScaleTime<number, number> | ScaleLinear<number, number>
+const config = {
+    // lineColor: "#a00037",
+    // circleColor: "#a00037",
+    borderCircleColor: "#ffffff",
+};
+
 
 interface Props {
     items: graphData[]
+    xScale: ScaleD3,
+    yScale: ScaleD3,
+    mainColor: string,
 }
-
-let getScales = (graphData: graphData[]): [ScaleD3, ScaleD3] => {
-    let xScale = d3.scaleTime().range([margin.left, width - margin.right]);
-    let yScale = d3.scaleLinear().range([height-margin.top, margin.bottom]);
-    xScale.domain(d3.extent(graphData, d => d.date) as [Date, Date]);
-    yScale.domain(d3.extent(graphData, d => d.price) as [number, number]);
-    return [xScale, yScale];
-};
 
 function getLine(graphData: graphData[], xScale: ScaleD3, yScale: ScaleD3) {
     return d3.line<graphData>()
@@ -29,27 +24,15 @@ function getLine(graphData: graphData[], xScale: ScaleD3, yScale: ScaleD3) {
         .y(d => yScale(d.price))
 }
 
-const drawLine = (graphData: graphData[]): string =>{
-    let [xScale, yScale] = getScales(graphData);
+const drawLine = (graphData: graphData[], xScale: ScaleD3, yScale: ScaleD3): string =>{
     let lineGenerator = getLine(graphData, xScale, yScale);
+    console.log("linegenerator" + lineGenerator(graphData));
     return lineGenerator(graphData) as string;
 };
 
-const drawAxis = (graphData: graphData[], refXAxis: any, refYAxis: any, xScale: ScaleD3, yScale: ScaleD3): void => {
-    let xAxis = d3.axisBottom(xScale);
-    let yAxis = d3.axisLeft(yScale);
-    d3.select(refXAxis).call(xAxis);
-    d3.select(refYAxis).call(yAxis);
-};
 
-const drawGraphWithD3 = (graphData: graphData[], references: {refXAxis: any, refYAxis: any}): void => {
-    let [xScale, yScale] = getScales(graphData);
-    let {refXAxis, refYAxis} = references;
-    drawAxis(graphData, refXAxis, refYAxis, xScale, yScale);
-};
-
-const CircleInfo: React.FC<{x: number, y: number, price: number, date: Date, mouseMove: any, mouseLeave: any}> =
-    ({x, y, price, date, mouseMove, mouseLeave}) => {
+const CircleInfo: React.FC<{x: number, y: number, price: number, date: Date, mainColor: string, mouseMove: any, mouseLeave: any}> =
+    ({x, y, price, date, mainColor, mouseMove, mouseLeave}) => {
     return (
         <circle
             cx={x}
@@ -57,7 +40,7 @@ const CircleInfo: React.FC<{x: number, y: number, price: number, date: Date, mou
             r="10"
             fill="white"
             strokeWidth='2'
-            style={{ fill: circleColor, stroke: "black"}}
+            style={{ fill: mainColor, stroke: config.borderCircleColor}}
             onMouseMove={(e) => mouseMove(e, price, date)}
             onMouseLeave={mouseLeave}
         >
@@ -83,22 +66,14 @@ const useShowPointInfo = (price: number, date: Date, x: number, y: number) => {
     }
 };
 
-
-export const Graph: React.FC<Props> = ({items}) => {
+export const Graph: React.FC<Props> = ({items, xScale, yScale, mainColor}) => {
     const [graphData, setGraphData] = useState([{date: new Date(), price: 10}]);
     const pointInfo = useShowPointInfo(0, new Date(), 0, 0);
-    const [xScale, yScale] = getScales(graphData);
-    const refXAxis = useRef<SVGGElement>(null);
-    const refYAxis = useRef<SVGGElement>(null);
     useEffect( () => {
         function getGraphData () {
             setGraphData(items)
         }
         getGraphData();
-        drawGraphWithD3(graphData, {
-            refXAxis: refXAxis.current,
-            refYAxis: refYAxis.current,
-        })
     });
 
     const handleMouseMove = (e: MouseEvent, price: number, date: Date) => {
@@ -113,32 +88,18 @@ export const Graph: React.FC<Props> = ({items}) => {
     };
 
     return (
-        <div className="graph-container">
-            <svg width={width} height={height}>
-                <path d={drawLine(graphData)} fill='none' stroke={lineColor}/>
+            <Fragment>
+                <path d={drawLine(graphData, xScale, yScale)} fill='none' stroke={mainColor} strokeWidth="3"/>
                 <g>
-                    <g ref={refXAxis} transform={`translate(0, ${height-margin.bottom})`}/>
-                    <g ref={refYAxis} transform={`translate(${margin.left}, 0)`}/>
                     <g>
                         {
                             graphData.map(d => {
                                 return <CircleInfo x={xScale(d.date)} y={yScale(d.price)}
-                                                   price={d.price} date={d.date}
+                                                   price={d.price} date={d.date} mainColor={mainColor}
                                                    mouseLeave={handleMouseLeave} mouseMove={handleMouseMove}/>
                             })
                         }
                     </g>
                 </g>
-            </svg>
-            <div className="tooltip">
-                {
-                    pointInfo.showPoint ?
-                        <div style={{position: "absolute", left: pointInfo.pointCoords.x - 50,
-                            top: pointInfo.pointCoords.y - 50, fontSize: '25px', color: "red"}}>{pointInfo.pointPrice}</div> :
-                        <div></div>
-                }
-            </div>
-        </div>
-
-    )
-}
+            </Fragment>
+)};

@@ -1,18 +1,11 @@
-import { graphData, Product } from './ProductAggregator';
+import { graphData, Product, ScaleD3 } from './InterfacesTypes';
 import {useEffect, useState} from 'react'
 import  * as React from 'react'
 import './ShowResult.css'
-import * as d3 from 'd3'
 import {Graph} from './Graph'
+import { graphConfig, getGraphData, getScales, expandGraphData, sanitizeGraphData, providerToColor } from './graphsUtils'
+import { Axis } from "./Axis";
 
-let sanitizeGraphData = (d: any): graphData => {
-    return {date: d3.timeParse("%Y-%m-%d")(d.date) as Date, price: d.price}
-};
-
-let getGraphData = (product: Product): graphData[][] => {
-    const prices = product.providersSimple.map(ps => ps.prices);
-    return prices;
-};
 
 function useProduct() {
     const initialState: Product = {
@@ -30,7 +23,7 @@ function useProduct() {
                 },
                 prices : [{
                     price: 100,
-                    date: new Date(),
+                    date: new Date('04/10/2020'),
                 }, {
                         price: 150,
                         date: new Date("04/08/2020"),
@@ -49,7 +42,10 @@ function useProduct() {
                 },
                 prices : [{
                     price: 200,
-                    date: new Date(),
+                    date: new Date('04/10/2020'),
+                }, {
+                    price: 260,
+                    date: new Date('04/08/2020'),
                 }],
             }
 
@@ -65,7 +61,10 @@ export default function ShowResult(): JSX.Element {
     useEffect(() => {
         document.title = `Hola!`;
     });
-    console.log(getGraphData(product));
+    let expandedGraphData = expandGraphData(getGraphData(product));
+    // expandedGraphData = expandedGraphData.map(p => sanitizeGraphData(p));
+    console.log(expandedGraphData);
+    const [xScale, yScale] = getScales(expandedGraphData);
     return (
         <div className="result-container">
             <div className="name-img-container">
@@ -77,7 +76,10 @@ export default function ShowResult(): JSX.Element {
                             product.providersSimple.map((provider_info, index) => {
                                 return(
                                     <div key={index}><a href={provider_info.url}>
-                                        <span >{provider_info.provider}: </span><span className="provider-price">{provider_info.prices[0].price}</span>
+                                            <span >
+                                                <span style={{color: providerToColor[provider_info.provider], fontSize: '27px'}}>■ </span>
+                                                {provider_info.provider}: </span><span className="provider-price">{provider_info.prices[0].price}
+                                            </span>
                                         </a>
                                     </div>
                                 )
@@ -87,10 +89,19 @@ export default function ShowResult(): JSX.Element {
                 </div>
             </div>
             <div className="insight-container">
+                <svg width={graphConfig.width} height={graphConfig.height}>
+                    <Axis xScale={xScale} yScale={yScale}/>
                 {
-                    getGraphData(product).map((graphData: graphData[], index) => <Graph items={graphData}/>)
+                    product.providersSimple.map((provider, index) => {
+                        return <Graph
+                            items={provider.prices} xScale={xScale} yScale={yScale} mainColor={providerToColor[provider.provider]}
+                        />
+                    })
+                    // getGraphData(product).map((graphData: graphData[]) => <Graph
+                    //     items={graphData} xScale={xScale} yScale={yScale} mainColor={"red"}
+                    // />)
                 }
-                {/*<Graph items={getGraphData()}/>*/}
+                </svg>
             </div>
         </div>
     )
