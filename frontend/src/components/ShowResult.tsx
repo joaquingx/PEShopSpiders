@@ -1,9 +1,9 @@
-import { graphData, Product, ScaleD3 } from './InterfacesTypes';
+import { Product } from './InterfacesTypes';
 import {useEffect, useState} from 'react'
 import  * as React from 'react'
 import './ShowResult.css'
 import {Graph} from './Graph'
-import { graphConfig, getGraphData, getScales, expandGraphData, sanitizeGraphData, providerToColor } from './graphsUtils'
+import { graphConfig, getScales, expandGraphData, providerToColor } from './graphsUtils'
 import { Axis } from "./Axis";
 
 
@@ -44,11 +44,25 @@ function useProduct() {
                     price: 200,
                     date: new Date('04/10/2020'),
                 }, {
-                    price: 260,
+                    price: 300,
+                    date: new Date('04/08/2020'),
+                }],
+            },
+            {
+                provider: 'wong',
+                url: 'https://www.youtube.com/watch?v=2P3YX2i782I',
+                location : {
+                    lat: 344.62264,
+                    lng: -58.44104,
+                },
+                prices : [{
+                    price: 120,
+                    date: new Date('04/10/2020'),
+                }, {
+                    price: 130,
                     date: new Date('04/08/2020'),
                 }],
             }
-
         ]
     };
     const [product , setProduct] = useState<Product>(initialState);
@@ -59,16 +73,14 @@ function useProduct() {
 export default function ShowResult(): JSX.Element {
     const product = useProduct();
     useEffect(() => {
-        document.title = `Hola!`;
+        document.title = product.name;
     });
-    let expandedGraphData = expandGraphData(getGraphData(product));
-    // expandedGraphData = expandedGraphData.map(p => sanitizeGraphData(p));
-    console.log(expandedGraphData);
+    let expandedGraphData = expandGraphData(product.providersSimple.map(p => p.prices));
     const [xScale, yScale] = getScales(expandedGraphData);
     return (
         <div className="result-container">
             <div className="name-img-container">
-                <a className="try"><img  className="img-product" src={product.imgUrl}/></a>
+                <a className="try"><img alt="product image" className="img-product" src={product.imgUrl}/></a>
                 <div className="name-prices-container">
                     <p className="name-product">{product.name}</p>
                     <div className="prices-container">
@@ -94,12 +106,10 @@ export default function ShowResult(): JSX.Element {
                 {
                     product.providersSimple.map((provider, index) => {
                         return <Graph
+                            key={index}
                             items={provider.prices} xScale={xScale} yScale={yScale} mainColor={providerToColor[provider.provider]}
                         />
                     })
-                    // getGraphData(product).map((graphData: graphData[]) => <Graph
-                    //     items={graphData} xScale={xScale} yScale={yScale} mainColor={"red"}
-                    // />)
                 }
                 </svg>
             </div>

@@ -2,31 +2,31 @@ import * as d3 from 'd3'
 import * as React from 'react'
 import { Fragment } from 'react'
 import {useEffect, useState} from 'react'
-import { graphData, ScaleD3 } from './InterfacesTypes'
+import { Price, ScaleD3 } from './InterfacesTypes'
 
 const config = {
-    // lineColor: "#a00037",
-    // circleColor: "#a00037",
-    borderCircleColor: "#ffffff",
+    circle: {
+        borderCircleColor: "#616161",
+        radius: 5,
+    }
 };
 
 
 interface Props {
-    items: graphData[]
+    items: Price[]
     xScale: ScaleD3,
     yScale: ScaleD3,
     mainColor: string,
 }
 
-function getLine(graphData: graphData[], xScale: ScaleD3, yScale: ScaleD3) {
-    return d3.line<graphData>()
+function getLine(graphData: Price[], xScale: ScaleD3, yScale: ScaleD3) {
+    return d3.line<Price>()
         .x(d => xScale(d.date))
         .y(d => yScale(d.price))
 }
 
-const drawLine = (graphData: graphData[], xScale: ScaleD3, yScale: ScaleD3): string =>{
+const drawLine = (graphData: Price[], xScale: ScaleD3, yScale: ScaleD3): string =>{
     let lineGenerator = getLine(graphData, xScale, yScale);
-    console.log("linegenerator" + lineGenerator(graphData));
     return lineGenerator(graphData) as string;
 };
 
@@ -37,10 +37,10 @@ const CircleInfo: React.FC<{x: number, y: number, price: number, date: Date, mai
         <circle
             cx={x}
             cy={y}
-            r="10"
+            r={config.circle.radius}
             fill="white"
-            strokeWidth='2'
-            style={{ fill: mainColor, stroke: config.borderCircleColor}}
+            strokeWidth='2.2'
+            style={{ fill: mainColor, stroke: config.circle.borderCircleColor}}
             onMouseMove={(e) => mouseMove(e, price, date)}
             onMouseLeave={mouseLeave}
         >
@@ -83,7 +83,7 @@ export const Graph: React.FC<Props> = ({items, xScale, yScale, mainColor}) => {
         pointInfo.setPointPrice(price);
     };
 
-    const handleMouseLeave = (e: MouseEvent) => {
+    const handleMouseLeave = () => {
       pointInfo.setShowPoint(false);
     };
 
@@ -93,8 +93,8 @@ export const Graph: React.FC<Props> = ({items, xScale, yScale, mainColor}) => {
                 <g>
                     <g>
                         {
-                            graphData.map(d => {
-                                return <CircleInfo x={xScale(d.date)} y={yScale(d.price)}
+                            graphData.map((d, index) => {
+                                return <CircleInfo key={index} x={xScale(d.date)} y={yScale(d.price)}
                                                    price={d.price} date={d.date} mainColor={mainColor}
                                                    mouseLeave={handleMouseLeave} mouseMove={handleMouseMove}/>
                             })

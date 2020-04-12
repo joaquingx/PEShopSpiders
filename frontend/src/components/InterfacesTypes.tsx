@@ -15,7 +15,7 @@ export interface Product {
     providersSimple: ProviderSimple[]; // in order
 }
 
-interface Price {
+export interface Price {
     price: number;
     date:  Date;
 }
@@ -36,12 +36,6 @@ interface ProviderSimple {
         lat: number;
     };
     prices: Price[];  // intended to be sort.
-}
-
-// interfaces for visualizations
-export interface graphData {
-    date: Date,
-    price: number,
 }
 
 // @ts-ignore

@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { ScaleD3 } from "./InterfacesTypes";
 import { Fragment } from 'react'
-import * as d3 from 'd3'
 
 interface Props {
     xScale: ScaleD3,
@@ -23,9 +22,6 @@ export const Axis: React.FC<Props> = ({xScale, yScale}) => {
     const xFormatter = xScale.tickFormat(xTicks.length, '%B %d');
     const yTicks = yScale.ticks();
 
-    // console.log(xScale.tickFormat(4, '%Y-%M'));
-    console.log("ticks " + xTicks);
-    console.log("tickeanos" + d3.axisBottom(xScale).tickArguments());
     return (
         <Fragment>
             <line x1={xStart} x2={xEnd} y1={yStart} y2={yStart} stroke={config.axisColor}/>
