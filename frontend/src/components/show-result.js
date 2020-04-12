@@ -4,6 +4,7 @@ import "bootstrap/dist/js/bootstrap.min"
 import './showresult.css'
 import axios from 'axios';
 
+
 export default class ShowResult extends Component{
     constructor(props) {
         super(props);
@@ -19,25 +20,6 @@ export default class ShowResult extends Component{
             sorted_prices: [],
         }
     }
-    //
-    // componentDidMount() {
-    //     axios.get('http://localhost:5000/results/' + this.props.match.params.id)
-    //         .then(response => {
-    //             this.setState({
-    //                 card_prices: response.data.card_prices,
-    //                 regular_prices: response.data.regular_prices,
-    //                 online_prices: response.data.online_prices,
-    //                 descriptions: response.data.descriptions,
-    //                 name: response.data.name,
-    //                 stocks: response.data.stocks,
-    //                 urls: response.data.urls,
-    //                 starss: response.data.starss,
-    //                 img_urls: response.data.img_urls,
-    //                 sorted_prices: response.data.sorted_prices,
-    //             });
-    //         })
-    //         .catch(error => console.log(error));
-    // }
 
     render(){
 
