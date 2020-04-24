@@ -1,4 +1,7 @@
+import json
+
 from scrapy.spiders import SitemapSpider
+from loaders.shop_loaders import ShopItemLoader
 
 
 class RipleySpider(SitemapSpider):
@@ -6,27 +9,23 @@ class RipleySpider(SitemapSpider):
     name = "ripley"
     sitemap_urls = ['https://home.ripley.com.pe/products_sitemap.xml']
     allowed_domains = ['simple.ripley.com.pe']
-    
+
     def parse(self, response):
 
-        def getValue(text,tag):
-            return response.xpath('//*[contains(@class,"'+text+'")]/'+tag+'/text()').extract_first()
+        def get_value(text, tag):
+            return f'//*[contains(@class,"{text}")]/{tag}/text()'
 
-        brand = response.xpath('//td[contains(text(),"Marca")]/following-sibling::td/text()').extract_first()
-        iPrice = getValue('product-internet-price','span[2]')
-        nPrice = getValue('product-normal-price','span[2]')
-        rPrice = getValue('product-ripley-price','span[2]')
-        description = getValue('product-short-description','')
-        discount = getValue('discount-percentage','')
-        
-        yield{
-            'Code':  response.xpath('//*[contains(@itemprop,"sku")]/text()').extract_first(),
-            'Brand': brand if brand else "Not found",
-            'Description': description if description else "Not found",
-            'Internet_Price': iPrice if iPrice else "Not found",
-            'Normal_Price': nPrice if nPrice else "Not found",
-            'Ripley_Price': rPrice if rPrice else "Not found",
-            'Product_Name': getValue('product-header hidden-xs','h1'),
-            'Url': response.url,
-            'Discount': discount if discount else "Not found",
-        }
+        loader = ShopItemLoader(item={}, selector=response)
+
+        loader.add_xpath('price', get_value('product-internet-price', 'span[2]'))
+        loader.add_xpath('price',  get_value('product-normal-price', 'span[2]'))
+        loader.add_xpath('price', get_value('product-ripley-price', 'span[2]'))
+        loader.add_xpath('brand', '//td[contains(text(),"Marca")]/following-sibling::td/text()')
+        loader.add_xpath('description', get_value('product-short-description', ''))
+        loader.add_xpath('name', get_value('product-header hidden-xs', 'h1'))
+        loader.add_xpath('img_url', '//meta[contains(@property, "og:image")]/@content', re="(home.*|http.*)")
+        loader.add_value('url', response.url)
+        currency_dictionary = response.xpath("//script[contains(@type, 'application/ld+json')]/text()").extract_first()
+        loader.add_value('currency', json.loads(currency_dictionary)['offers']['priceCurrency'])
+
+        yield loader.load_item()

@@ -7,7 +7,6 @@ from inline_requests import inline_requests
 from loaders.shop_loaders import ShopItemLoader
 
 
-# TODO: Handle completely card_price
 class SuperMarketBase(SitemapSpider):
     sitemap_rules = [
         ('/p', 'parse_item'),  # Parse products(/p) with parse_item
@@ -37,13 +36,14 @@ class SuperMarketBase(SitemapSpider):
 
         css_st = '.{}::text'
         result = ShopItemLoader(item={}, selector=response)
-        result.add_css('regular_price', css_st.format('skuListPrice'))
-        result.add_css('online_price', css_st.format('skuBestPrice'))
-        result.add_value('card_price', card_price)
+        result.add_css('price', css_st.format('skuListPrice'))
+        result.add_css('price', css_st.format('skuBestPrice'))
+        result.add_value('price', card_price)
         result.add_css('description', '.productDescription')
         result.add_css('name', '.productName::text')
         result.add_css('img_url', '.image-zoom::attr(href)')
         result.add_value('url', response.url)
+        result.add_xpath('currency', '//meta[contains(@name, "currency")]/@content')
         result.add_css('stock', 'script', re='"skuStocks"\:\{.*?\:(\d+)\}')
         result.add_value('stars', '0')  # Apparently stars doesn't work for now
 

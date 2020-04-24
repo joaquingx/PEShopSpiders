@@ -2,23 +2,24 @@
 import scrapy	
 import re	
 
-from ShopSpiders.loaders.shop_loaders import ShopItemLoader	
+from loaders.shop_loaders import ShopItemLoader
 
-
+# Assuming all price are in PEN.
 class AdidasSpider(scrapy.Spider):	
     name = 'adidas'	
     allowed_domains = ['adidas.pe']	
-    start_urls = ['https://m.adidas.pe/on/demandware.store/Sites-adidas-PE-Site/es_PE/Search-BrowseCatalog']	
+    start_urls = ['https://m.adidas.pe/on/demandware.store/Sites-adidas-PE-Site/es_PE/Search-BrowseCatalog']
 
-    def parse(self, response):	
+    def parse(self, response):
         adidas_items = response.xpath('//*[contains(@class, "innercard")]')	
         for adidas_item in adidas_items:	
             shop_loader = ShopItemLoader(item={}, selector=adidas_item)	
-            shop_loader.add_value('regular_price', re.findall(r'\d+\.\d+|\d+', adidas_item.xpath(	
-                './/*[@class="new-plp-layout-enabled"]/div/*[contains(@class, "salesprice")]/text()').extract_first())[0])	
+            shop_loader.add_value('price', re.findall(r'\d+\.\d+|\d+', adidas_item.xpath(
+                './/*[@class="new-plp-layout-enabled"]/div/*[contains(@class, "salesprice")]/text()').extract_first())[0])
+            shop_loader.add_value('url', "https://adidas.pe")
             shop_loader.add_xpath('name', './/*[@class="title"]/text()')	
             shop_loader.add_xpath('url', './/*[@class="image plp-image-bg"]/a/@href')	
-            shop_loader.add_xpath('img_url', './/*[@class="image plp-image-bg"]/a/@href')	
+            shop_loader.add_xpath('img_url', './/*[@class="image plp-image-bg"]/a/img/@data-original')
             item_width = adidas_item.xpath('.//*[@class="rating-stars rating-stars-filled"]/@style').extract_first()	
             item_stars = str(int(re.findall(r'\d+', item_width)[0]) / 20) if item_width else 'Not Ranked'	
 
