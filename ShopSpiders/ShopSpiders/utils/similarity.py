@@ -1,4 +1,5 @@
 """PAUSED: Machine learning implementation for similarities."""
+import jaro
 from collections import defaultdict
 from pprint import pprint
 from gensim import corpora, models, similarities
@@ -7,6 +8,19 @@ from typing import Type, List
 from utils.normalization import normalize, get_frequency_for_dict, str_to_strlist
 from utils.mongo_db_utils import get_collection
 from data import get_data_file
+
+
+# Jaro implementation
+def get_most_similar(items: list, document: dict, threshold=0.895):
+    """Search for most similar in items. Also, item should be at least threshold similar to be considered."""
+    similar, ratio = None, 0
+    for item in items:
+        if 'name' in item:
+            similarity = jaro.jaro_winkler_metric(normalize(item['name']), normalize(document['name']))
+            # print(item['name'], document['name'], similarity)
+            if similarity > threshold and similarity > ratio:
+                similar, ratio = item['_id'], similarity
+    return similar, ratio
 
 
 class FeatureVector:

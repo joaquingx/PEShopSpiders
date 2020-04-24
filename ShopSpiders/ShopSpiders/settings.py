@@ -25,7 +25,7 @@ ITEM_PIPELINES = {
 }
 
 MONGO_URI = 'mongodb+srv://user1:user1@cluster0-lnitk.gcp.mongodb.net/test?retryWrites=true&w=majority'
-MONGO_DB = 'shop-results-2'
+MONGO_DB = 'shop-raw-results'
 MONGO_COLLECTION = 'results'
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
