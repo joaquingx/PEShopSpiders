@@ -3,9 +3,8 @@ from typing import List
 
 def exist_exact_item_in_product_list_object(product_list: List[dict], product_to_evaluate: dict):
     try:
-        return True if [product for product in product_list if product_to_evaluate['name'] == product['real_name']
-                        and product_to_evaluate['price'] == product['prices'][-1]['price']
-                        and product_to_evaluate['spider'] == product['provider']] else False
+        return True if [ product for product in product_list if
+                        product_to_evaluate['spider'] == product['provider']] else False
     except:
         return False
 
@@ -14,7 +13,8 @@ def exist_item_in_different_date(product_list: List[dict], product_to_evaluate: 
     try:
         return True if [product for product in product_list if product_to_evaluate['name'] == product['real_name']
                     and product_to_evaluate['price'] != product['prices'][-1]['price']
-                    and product_to_evaluate['spider'] == product['provider']] else False
+                    and product_to_evaluate['spider'] == product['provider']
+                    and product_to_evaluate['url'] == product["url"]] else False
     except:
         return False
 

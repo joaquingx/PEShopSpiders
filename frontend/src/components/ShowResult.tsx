@@ -1,11 +1,17 @@
 import { Product } from './InterfacesTypes';
 import {useEffect, useState} from 'react'
 import  * as React from 'react'
+import { useParams, useLocation } from "react-router-dom";
 import './ShowResult.css'
 import {Graph} from './Graph'
 import { graphConfig, getScales, expandGraphData, providerToColor } from './graphsUtils'
 import { Axis } from "./Axis";
+import axios from "axios";
 
+export interface ClusterParams {
+    name: string,
+    threshold: string,
+}
 
 function useProduct() {
     const initialState: Product = {
@@ -59,22 +65,38 @@ function useProduct() {
                     price: 120,
                     date: new Date('04/10/2020'),
                 }, {
-                    price: 130,
+                    price: 200,
                     date: new Date('04/08/2020'),
                 }],
             }
         ]
     };
     const [product , setProduct] = useState<Product>(initialState);
-    return product;
+    return {
+        product,
+        setProduct
+    };
+}
+function useQuery() {
+    return new URLSearchParams(useLocation().search);
 }
 
-
-export default function ShowResult(): JSX.Element {
-    const product = useProduct();
+export const ShowResult: React.FC<ClusterParams> = ({name, threshold}) => {
+    const ss = useProduct()
+    const product = ss["product"];
+    const query = useQuery();
     useEffect(() => {
         document.title = product.name;
     });
+    useEffect(() => {
+        const fetchData = async () => {
+            const url = new URL(`http://localhost:8080/clusterized/search=${query.get("name")}&sim=${query.get("threshold")}`)
+            const result = await axios.get(url.href);
+            let cleanResult = result.data;
+            ss["setProduct"](cleanResult);
+        }
+        fetchData();
+    })
     let expandedGraphData = expandGraphData(product.providersSimple.map(p => p.prices));
     const [xScale, yScale] = getScales(expandedGraphData);
     return (
@@ -90,8 +112,8 @@ export default function ShowResult(): JSX.Element {
                                     <div key={index}><a href={provider_info.url}>
                                             <span >
                                                 <span style={{color: providerToColor[provider_info.provider], fontSize: '27px'}}>■ </span>
-                                                {provider_info.provider}: </span><span className="provider-price">{provider_info.prices[0].price}
-                                            </span>
+                                                {provider_info.provider}: </span>
+                                                <span className="provider-price">{provider_info.prices[provider_info.prices.length-1].price}</span>
                                         </a>
                                     </div>
                                 )

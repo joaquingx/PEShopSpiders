@@ -1,8 +1,16 @@
 import * as React from 'react'
+import {ChangeEvent, useState} from 'react';
 import 'font-awesome/css/font-awesome.min.css'
 import './Sidebar.css'
+import { useHistory } from "react-router-dom";
+// import "bootstrap/dist/css/bootstrap.min.css"
 
 export default function Sidebar(): JSX.Element{
+    const [searchValue, setSearchValue] = useState("");
+    const history = useHistory();
+    const changeSearchValue = (event: ChangeEvent<HTMLInputElement>) => {
+        console.log(event.target.value);
+    }
     return (
         <nav className="navbar">
             <ul className="navbar-nav">
@@ -15,7 +23,15 @@ export default function Sidebar(): JSX.Element{
                 <li className="nav-item">
                     <a href="#" className="nav-link">
                         <i className="fa fa-size fa-search"/>
-                        <span className="link-text">Search</span>
+                        <input className="link-text search-input"
+                               onChange={(e) => setSearchValue(e.target.value) }
+                               onKeyPress={(e) => {
+                                   if(e.key == "Enter"){
+                                        history.push(`/cluster?name=${searchValue}&threshold=0.7`)
+                                   }
+                               }}>
+
+                        </input>
                     </a>
                 </li>
                 <li className="nav-item">
