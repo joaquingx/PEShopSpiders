@@ -6,7 +6,7 @@ import { Price, ScaleD3 } from './InterfacesTypes'
 
 const config = {
     circle: {
-        borderCircleColor: "#616161",
+        borderCircleColor: "#000000",
         radius: 5,
     }
 };

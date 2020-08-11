@@ -32,6 +32,13 @@ main {
     padding: 1em;
 }
 
+.search-input {
+    width: 50%;
+    height: 50%;
+    font-size: 16px;
+    font-family: 'Inconsolata';
+}
+
 .navbar {
     position: fixed;
     background-color: var(--bg-primary);
@@ -68,7 +75,7 @@ main {
 }
 
 .nav-item {
-    width: 100%;
+    width: 150%;
 }
 
 .nav-item:last-child {
