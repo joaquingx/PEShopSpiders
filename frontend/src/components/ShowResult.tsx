@@ -1,7 +1,7 @@
 import { Product } from './InterfacesTypes';
 import {useEffect, useState} from 'react'
 import  * as React from 'react'
-import { useParams, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import './ShowResult.css'
 import {Graph} from './Graph'
 import { graphConfig, getScales, expandGraphData, providerToColor } from './graphsUtils'
@@ -81,7 +81,7 @@ function useQuery() {
     return new URLSearchParams(useLocation().search);
 }
 
-export const ShowResult: React.FC<ClusterParams> = ({name, threshold}) => {
+export const ShowResult = () => {
     const ss = useProduct()
     const product = ss["product"];
     const query = useQuery();
@@ -90,7 +90,7 @@ export const ShowResult: React.FC<ClusterParams> = ({name, threshold}) => {
     });
     useEffect(() => {
         const fetchData = async () => {
-            const url = new URL(`http://localhost:8080/clusterized/search=${query.get("name")}&sim=${query.get("threshold")}`)
+            const url = new URL(`http://localhost:8080/clusterized/?search=${query.get("name")}&sim=${query.get("threshold")}`)
             const result = await axios.get(url.href);
             let cleanResult = result.data;
             ss["setProduct"](cleanResult);

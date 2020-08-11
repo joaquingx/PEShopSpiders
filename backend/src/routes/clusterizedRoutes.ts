@@ -5,14 +5,14 @@ import axios from "axios";
 let flask_api = "http://localhost:5002"
 
 export const registerRoutes = (app: express.Application) => {
-    app.get("/clusterized/search=:name&sim=:sim", async (req, res) => {
+    app.get("/clusterized/", async (req, res) => {
         const  getUrl = (flask_url: string, name: string, sim: string) => {
-            const url = new URL(flask_api)
+            const url = new URL(flask_api);
             url.searchParams.append("input", name);
             url.searchParams.append("threshold", sim);
             return url;
         }
-        const url = getUrl(flask_api, req.params.name, req.params.sim);
+        const url = getUrl(flask_api, req.query.search as string, req.query.sim as string);
         try {
             let response = await axios.get(url.href);
             if (response.status == 200) {

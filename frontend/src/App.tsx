@@ -7,11 +7,9 @@ import {
     Switch,
     Route,
     Link,
-    useLocation,
 } from "react-router-dom"
 
 export default function App(): JSX.Element {
-    // const query = useQuery();
     return (
         <div>
             <Router>
@@ -19,7 +17,7 @@ export default function App(): JSX.Element {
                 <Switch>
                     <Route path="/cluster">
                         <Sidebar/>
-                        <ShowResult name="adilette" threshold="0.5"/>
+                        <ShowResult/>
                     </Route>
                 </Switch>
             </Router>
