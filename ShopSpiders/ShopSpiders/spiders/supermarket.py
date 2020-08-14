@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 import json
 
-from scrapy.spiders import SitemapSpider
+from spiders.base.base_spiders import CustomSiteMapSpider
 from scrapy import Request
 from inline_requests import inline_requests
 from loaders.shop_loaders import ShopItemLoader
 
 
-class SuperMarketBase(SitemapSpider):
+class SuperMarketBase(CustomSiteMapSpider):
+    retry_times = 30
     sitemap_rules = [
         ('/p', 'parse_item'),  # Parse products(/p) with parse_item
     ]
@@ -34,17 +35,18 @@ class SuperMarketBase(SitemapSpider):
                 except (KeyError, IndexError) as e:
                     card_price = 'Not Found'
 
-        css_st = '.{}::text'
+        product_dict = json.loads(response.css(f"script").re_first(f"skuJson_0 = (.*);CATALOG"))
+        sku_dict = product_dict["skus"][0]
         result = ShopItemLoader(item={}, selector=response)
-        result.add_css('price', css_st.format('skuListPrice'))
-        result.add_css('price', css_st.format('skuBestPrice'))
+        result.add_value('price', sku_dict["listPriceFormated"])
+        result.add_value('price', sku_dict["bestPriceFormated"])
         result.add_value('price', card_price)
         result.add_css('description', '.productDescription')
-        result.add_css('name', '.productName::text')
-        result.add_css('img_url', '.image-zoom::attr(href)')
+        result.add_value('name', product_dict["name"])
+        result.add_value('img_url', sku_dict["image"])
         result.add_value('url', response.url)
         result.add_xpath('currency', '//meta[contains(@name, "currency")]/@content')
-        result.add_css('stock', 'script', re='"skuStocks"\:\{.*?\:(\d+)\}')
+        result.add_value('stock', sku_dict["available"])
         result.add_value('stars', '0')  # Apparently stars doesn't work for now
 
         yield result.load_item()
@@ -85,5 +87,8 @@ class PlazaVeaSpider(SuperMarketBase):
         'plazavea.com.pe',
         'tienda.plazavea.com.pe'
     ]
+    custom_settings = {
+        "RETRY_TIMES": 15,
+    }
 
     card_url = 'https://tienda.plazavea.com.pe/api/catalog_system/pub/products/search?fq=skuId:{}'

@@ -6,6 +6,10 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from __future__ import absolute_import, division, unicode_literals
+
+from twisted.internet import reactor
+import twisted.internet.task
 
 
 class ShopspidersSpiderMiddleware(object):
@@ -101,3 +105,21 @@ class ShopspidersDownloaderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+
+DELAY_META = '__defer_delay'
+
+
+def defer_request(seconds, request):
+    meta = dict(request.meta)
+    meta.update({DELAY_META: seconds})
+    return request.replace(meta=meta)
+
+
+class DeferMiddleware(object):
+    def process_request(self, request, spider):
+        delay = request.meta.pop(DELAY_META, None)
+        if not delay:
+            return
+
+        return twisted.internet.task.deferLater(reactor, delay, lambda: None)

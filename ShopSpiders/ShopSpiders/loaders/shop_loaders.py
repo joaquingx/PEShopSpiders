@@ -1,7 +1,7 @@
 from typing import Union
 
 from scrapy.loader import ItemLoader
-from scrapy.loader.processors import TakeFirst, MapCompose, Join, Compose
+from scrapy.loader.processors import TakeFirst, MapCompose, Identity, Join, Compose
 from w3lib.html import replace_entities, replace_tags
 import re
 
@@ -15,7 +15,7 @@ def replace_decimals(value: str) -> str:
 
 
 def get_only_numbers(value: str) -> str:
-    f_value = re.sub(r'[A-Za-z/ ,]', '', value)
+    f_value = re.sub(r'[A-Za-z/ \s,]', '', value)
     return f_value
 
 
@@ -74,5 +74,6 @@ class ShopItemLoader(ItemLoader):
         replace_decimals,
         replace_not_found,
     )
+    stock_in = Identity()
     price_out = GetCheaper()
     currency_out = GetCurrency()

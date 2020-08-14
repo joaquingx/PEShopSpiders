@@ -1,6 +1,6 @@
-from scrapy.spiders import SitemapSpider
+from spiders.base.base_spiders import CustomSiteMapSpider
 
-class RipleySpider(SitemapSpider):
+class RipleySpider(CustomSiteMapSpider):
 
     name = "ripley_cat"
     sitemap_urls = ['https://home.ripley.com.pe/categories_sitemap.xml']
