@@ -1,10 +1,10 @@
 import json
 
-from scrapy.spiders import SitemapSpider
+from spiders.base.base_spiders import CustomSiteMapSpider
 from loaders.shop_loaders import ShopItemLoader
 
 
-class RipleySpider(SitemapSpider):
+class RipleySpider(CustomSiteMapSpider):
 
     name = "ripley"
     sitemap_urls = ['https://home.ripley.com.pe/products_sitemap.xml']

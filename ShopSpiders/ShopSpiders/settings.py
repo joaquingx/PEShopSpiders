@@ -28,8 +28,9 @@ MONGO_URI = 'mongodb+srv://user1:user1@cluster0-lnitk.gcp.mongodb.net/test?retry
 MONGO_DB = 'shop-raw-results'
 MONGO_COLLECTION = 'results'
 
+RETRY_TIMES = 2
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 64
+CONCURRENT_REQUESTS = 32
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
